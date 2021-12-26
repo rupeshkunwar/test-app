@@ -58,6 +58,6 @@ jobs:
           name: rupesh1050/myreactapp-dev
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile
+          dockerfile: Dockerfile.dev
           tag_with_ref: 'refs/*'
           labels: ${{ steps.meta.outputs.labels }}
