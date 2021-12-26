@@ -46,7 +46,7 @@ jobs:
         with:
           fetch-depth: 0 
       - name: Build the container image
-        run: docker build . --file Dockerfile --tag myreactapp:latest
+        run: docker build . --file Dockerfile.dev --tag myreactapp:latest
       - uses: anchore/scan-action@v3
         with:
             image: "myreactapp:latest"
