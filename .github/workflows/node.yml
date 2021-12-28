@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: Dev
-      url: 'www.accern.com'
+      url: 'https://www.accern.com'
     steps:
       - name: Deploy
         run: echo I am deploying on Dev Environment ! 
