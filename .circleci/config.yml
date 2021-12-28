@@ -1,0 +1,28 @@
+version: 2.1
+
+
+orbs:
+  node: circleci/node@4.7
+steps:
+      - checkout
+      - run:
+          name: build
+          command: |
+            npm run start
+            npm run build
+      - run:
+          name: build
+          command: |
+            npm run test
+      - store_artifacts:
+          path: test-reports/
+          destination: tr1
+      - store_test_results:
+          path: test-reports/
+
+workflows:
+  pipeline: 
+    jobs:
+      - node/test:
+          version: '16.10'
+          pkg-manager: npm
