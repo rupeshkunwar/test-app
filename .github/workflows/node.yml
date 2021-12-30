@@ -58,7 +58,7 @@ jobs:
           name: rupesh1050/multi-client
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile
+          dockerfile: ./client/Dockerfile
       - uses: anchore/scan-action@v3
         with:
             image: "rupesh1050/multi-nginx:latest"
@@ -69,7 +69,7 @@ jobs:
           name: rupesh1050/multi-nginx
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile
+          dockerfile: ./niginx/Dockerfile
           tag_with_ref: 'refs/*'
           labels: ${{ steps.meta.outputs.labels }}
       - uses: anchore/scan-action@v3
@@ -82,7 +82,7 @@ jobs:
           name: rupesh1050/multi-server
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile
+          dockerfile: ./server/Dockerfile
           tag_with_ref: 'refs/*'
           labels: ${{ steps.meta.outputs.labels }}
       - uses: anchore/scan-action@v3
@@ -95,6 +95,6 @@ jobs:
           name: rupesh1050/multi-worker
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile
+          dockerfile: ./worker/Dockerfile
           tag_with_ref: 'refs/*'
           labels: ${{ steps.meta.outputs.labels }}
