@@ -53,49 +53,7 @@ jobs:
             fail-build: false
       - uses: actions/checkout@master
       - name: Publish to rupesh1050/multi-client
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: rupesh1050/multi-client
-          username: ${{ secrets.DOCKER_NAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: ./client/Dockerfile
-          path : ./client 
-      - uses: anchore/scan-action@v3
-        with:
-            image: "rupesh1050/multi-nginx:latest"
-            fail-build: false
-      - name: Publish to rupesh1050/multi-nginx
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: rupesh1050/multi-nginx
-          username: ${{ secrets.DOCKER_NAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: ./niginx/Dockerfile
-          tag_with_ref: 'refs/*'
-          labels: ${{ steps.meta.outputs.labels }}
-      - uses: anchore/scan-action@v3
-        with:
-            image: "rupesh1050/multi-server:latest"
-            fail-build: false
-      - name: Publish to rupesh1050/multi-server
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: rupesh1050/multi-server
-          username: ${{ secrets.DOCKER_NAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: ./server/Dockerfile
-          tag_with_ref: 'refs/*'
-          labels: ${{ steps.meta.outputs.labels }}
-      - uses: anchore/scan-action@v3
-        with:
-            image: "rupesh1050/multi-worker:latest"
-            fail-build: false
-      - name: Publish to rupesh1050/multi-worker
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: rupesh1050/multi-worker
-          username: ${{ secrets.DOCKER_NAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: ./worker/Dockerfile
-          tag_with_ref: 'refs/*'
-          labels: ${{ steps.meta.outputs.labels }}
+        run: |
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_NAME" --password-stdin
+        docker push rupesh1050/multi-client
+ 
