@@ -24,8 +24,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - run: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
+    - run: docker run -e CI=true rupesh1050/react-test npm test
     
   DeployDev:
     name: Deploy to Dev 
@@ -37,22 +37,54 @@ jobs:
       name: Dev
       url: 'https://www.accern.com'
     steps:
-      - name: Deploy
+      - name: Build and publish
         run: echo I am deploying on Dev Environment ! 
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 
       - name: Build the container image
-        run: docker build . --file Dockerfile --tag myreactapp:latest
+        run: docker build . --file ./client/Dockerfile --tag rupesh1050/multi-client:latest
+        run: docker build . --file ./nginx/Dockerfile --tag rupesh1050/multi-nginx:latest
+        run: docker build . --file ./server/Dockerfile --tag rupesh1050/multi-server:latest
+        run: docker build . --file ./worker/Dockerfile --tag rupesh1050/multi-worker:latest
       - uses: anchore/scan-action@v3
         with:
-            image: "myreactapp:latest"
-            fail-build: false
+            image: "rupesh1050/multi-client:latest"
+            image: "rupesh1050/multi-nginx:latest"
+            image: "rupesh1050/multi-server:latest"
+            image: "rupesh1050/multi-worker:latest"
+            fail-build: ture
       - uses: actions/checkout@master
-      - name: Publish to Registry
+      - name: Publish to rupesh1050/multi-client
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: rupesh1050/myreactapp-dev
+          name: rupesh1050/multi-client
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile
+
+      - name: Publish to rupesh1050/multi-nginx
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: rupesh1050/multi-nginx
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile
+          tag_with_ref: 'refs/*'
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Publish to rupesh1050/multi-server
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: rupesh1050/multi-server
+          username: ${{ secrets.DOCKER_NAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile
+          tag_with_ref: 'refs/*'
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Publish to rupesh1050/multi-worker
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: rupesh1050/multi-worker
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           dockerfile: Dockerfile
