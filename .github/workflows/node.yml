@@ -50,10 +50,11 @@ jobs:
             docker build . --file ./worker/Dockerfile --tag rupesh1050/multi-worker:latest
       - uses: anchore/scan-action@v3
         with:
-            image: "rupesh1050/multi-client:latest"
-            image: "rupesh1050/multi-nginx:latest"
-            image: "rupesh1050/multi-server:latest"
-            image: "rupesh1050/multi-worker:latest"
+            image: |
+                 "rupesh1050/multi-client:latest"
+                 "rupesh1050/multi-nginx:latest"
+                 "rupesh1050/multi-server:latest"
+                 "rupesh1050/multi-worker:latest"
             fail-build: ture
       - uses: actions/checkout@master
       - name: Publish to rupesh1050/multi-client
