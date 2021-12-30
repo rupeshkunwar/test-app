@@ -43,10 +43,11 @@ jobs:
         with:
           fetch-depth: 0 
       - name: Build the container image
-        run: docker build . --file ./client/Dockerfile --tag rupesh1050/multi-client:latest
-        run: docker build . --file ./nginx/Dockerfile --tag rupesh1050/multi-nginx:latest
-        run: docker build . --file ./server/Dockerfile --tag rupesh1050/multi-server:latest
-        run: docker build . --file ./worker/Dockerfile --tag rupesh1050/multi-worker:latest
+        run: | 
+        docker build . --file ./client/Dockerfile --tag rupesh1050/multi-client:latest
+        docker build . --file ./nginx/Dockerfile --tag rupesh1050/multi-nginx:latest
+        docker build . --file ./server/Dockerfile --tag rupesh1050/multi-server:latest
+        docker build . --file ./worker/Dockerfile --tag rupesh1050/multi-worker:latest
       - uses: anchore/scan-action@v3
         with:
             image: "rupesh1050/multi-client:latest"
