@@ -54,6 +54,6 @@ jobs:
       - uses: actions/checkout@master
       - name: Publish to rupesh1050/multi-client
         run: |
-        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_NAME" --password-stdin
-        docker push rupesh1050/multi-client
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_NAME" --password-stdin
+            docker push rupesh1050/multi-client
  
