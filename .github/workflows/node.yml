@@ -59,6 +59,7 @@ jobs:
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           dockerfile: ./client/Dockerfile
+          path : ./client 
       - uses: anchore/scan-action@v3
         with:
             image: "rupesh1050/multi-nginx:latest"
