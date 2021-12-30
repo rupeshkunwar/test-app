@@ -24,8 +24,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    - run: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
-    - run: docker run -e CI=true rupesh1050/react-test npm test
+    - run: npm run build --if-present
+    - run: npm test
     
   DeployDev:
     name: Deploy to Dev 
