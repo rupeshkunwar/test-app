@@ -49,11 +49,7 @@ jobs:
             docker build -t rupesh1050/multi-worker:latest ./worker
       - uses: anchore/scan-action@v3
         with:
-            image: |
-                 ["rupesh1050/multi-client:latest",
-                 "rupesh1050/multi-nginx:latest",
-                 "rupesh1050/multi-server:latest",
-                 "rupesh1050/multi-worker:latest"]
+            image: "rupesh1050/multi-client:latest"
             fail-build: false
       - uses: actions/checkout@master
       - name: Publish to rupesh1050/multi-client
@@ -63,7 +59,10 @@ jobs:
           username: ${{ secrets.DOCKER_NAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           dockerfile: Dockerfile
-
+      - uses: anchore/scan-action@v3
+        with:
+            image: "rupesh1050/multi-nginx:latest"
+            fail-build: false
       - name: Publish to rupesh1050/multi-nginx
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -73,6 +72,10 @@ jobs:
           dockerfile: Dockerfile
           tag_with_ref: 'refs/*'
           labels: ${{ steps.meta.outputs.labels }}
+      - uses: anchore/scan-action@v3
+        with:
+            image: "rupesh1050/multi-server:latest"
+            fail-build: false
       - name: Publish to rupesh1050/multi-server
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -82,6 +85,10 @@ jobs:
           dockerfile: Dockerfile
           tag_with_ref: 'refs/*'
           labels: ${{ steps.meta.outputs.labels }}
+      - uses: anchore/scan-action@v3
+        with:
+            image: "rupesh1050/multi-worker:latest"
+            fail-build: false
       - name: Publish to rupesh1050/multi-worker
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
