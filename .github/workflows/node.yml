@@ -43,7 +43,7 @@ jobs:
           fetch-depth: 0 
       - name: Build the container image
         run: | 
-            docker build . --file ./client/Dockerfile --tag rupesh1050/multi-client:latest
+            docker build -t rupesh/multi-client:latest ./client
             docker build . --file ./nginx/Dockerfile --tag rupesh1050/multi-nginx:latest
             docker build . --file ./server/Dockerfile --tag rupesh1050/multi-server:latest
             docker build . --file ./worker/Dockerfile --tag rupesh1050/multi-worker:latest
