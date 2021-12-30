@@ -50,9 +50,9 @@ jobs:
       - uses: anchore/scan-action@v3
         with:
             image: |
-                 "rupesh1050/multi-client:latest"
-                 "rupesh1050/multi-nginx:latest"
-                 "rupesh1050/multi-server:latest"
+                 "rupesh1050/multi-client:latest",
+                 "rupesh1050/multi-nginx:latest",
+                 "rupesh1050/multi-server:latest",
                  "rupesh1050/multi-worker:latest"
             fail-build: false
       - uses: actions/checkout@master
