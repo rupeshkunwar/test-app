@@ -72,7 +72,7 @@ jobs:
         uses: matootie/dokube@v1.3.4
         with:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
-          clusterID: ${{secrets.CLUSTER_ID}}
+          clusterName: ${{secrets.CLUSTER_NAME}}
 
       - name: create secret 
         run: kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}}
