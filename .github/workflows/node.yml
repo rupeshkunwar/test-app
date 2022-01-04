@@ -42,7 +42,7 @@ jobs:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
           clusterName: ${{secrets.CLUSTER_NAME}}
       - name: create Namespace 
-        if: $'kubectl get namespace ${{ github.event.repository.name }} '== 'false'
+        if: $'kubectl get namespace ${{ github.event.repository.name }} '!= 'AlreadyExists'
         run: kubectl create namespace ${{ github.event.repository.name }}
       - name: create secret
         if: $'kubectl get sceret pgpassword -n ${{ github.event.repository.name }} ' == 'false'
