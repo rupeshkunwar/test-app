@@ -41,11 +41,17 @@ jobs:
         with:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
           clusterName: ${{secrets.CLUSTER_NAME}}
+      - name: check repo name
+      - run: echo ::set-env name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}')
+        shell: bash
+      - run: echo "$REPOSITORY_NAME"
+        shell: bash
+
       - name: create Namespace 
-        run: kubectl create namespace ${{github.repository}}
+        run: kubectl create namespace ${{REPOSITORY_NAME}}
       - name: create secret
         run: |
-          if $'kubectl get sceret pgpassword -n ${{github.repository}} ' == 'false' , then
-           kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{github.repository}}
+          if $'kubectl get sceret pgpassword -n ${{REPOSITORY_NAME}} ' == 'false' , then
+           kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{REPOSITORY_NAME}}
       - name : deploy on cluster 
-        run : kubectl apply -f ./k8s -n ${{github.repository}}
+        run : kubectl apply -f ./k8s -n ${{REPOSITORY_NAME}}
