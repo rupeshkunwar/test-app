@@ -44,7 +44,6 @@ jobs:
       - name: Build the container image
         run: | 
             docker build -t rupesh1050/multi-client:latest ./client
-            docker build -t rupesh1050/multi-nginx:latest ./nginx
             docker build -t rupesh1050/multi-server:latest ./server
             docker build -t rupesh1050/multi-worker:latest ./worker
       - uses: anchore/scan-action@v3
@@ -56,6 +55,26 @@ jobs:
         run: |
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_NAME }}" --password-stdin
             docker push rupesh1050/multi-client
-            docker push rupesh1050/multi-nginx
             docker push rupesh1050/multi-server
             docker push rupesh1050/multi-worker
+  DeployProd:
+    name: Deploy to Production 
+    needs: [DeployDev]
+    runs-on: ubuntu-latest
+    environment: 
+      name: Production
+      url: 'http://www.myapp.com'
+    steps:
+      - name: Deploy
+        run: echo I am deploying! 
+      - uses: actions/checkout@v2
+      - name: Set up Digitalocean cluster
+        uses: matootie/dokube@v1.3.4
+        with:
+          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          clusterID: ${{secrets.CLUSTER_ID}}
+
+      - name: create secret 
+        run: kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}}
+      - name : deploy on cluster 
+        run : kubectl apply -f ./k8s 
