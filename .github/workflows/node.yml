@@ -43,9 +43,8 @@ jobs:
           clusterName: ${{secrets.CLUSTER_NAME}}
 
       - name: create secret
-        run: |
-          if $'kubectl get sceret pgpassword -n ${{ github.event.repository.name }} ' == 'false' , then
-           kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{ github.event.repository.name }},
-           fi
+        if: $'kubectl get sceret pgpassword -n ${{ github.event.repository.name }} ' == 'false'
+        run: kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{ github.event.repository.name }},
+           
       - name : deploy on cluster 
         run : kubectl apply -f ./k8s -n ${{ github.event.repository.name }}
