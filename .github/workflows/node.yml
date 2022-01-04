@@ -23,43 +23,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
-    - run: docker run -e CI=true rupesh1050/react-test npm test
+
     
-  DeployDev:
-    name: Deploy to Dev 
-    if: |
-     github.event.ref == 'refs/heads/main' 
-    needs: [build ]
-    runs-on: ubuntu-latest
-    environment: 
-      name: Dev
-      url: 'https://www.accern.com'
-    steps:
-      - name: Build and publish
-        run: echo I am deploying on Dev Environment ! 
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 
-      - name: Build the container image
-        run: | 
-            docker build -t rupesh1050/multi-client:latest ./client
-            docker build -t rupesh1050/multi-server:latest ./server
-            docker build -t rupesh1050/multi-worker:latest ./worker
-      - uses: anchore/scan-action@v3
-        with:
-            image: "rupesh1050/multi-client:latest"
-            fail-build: false
-      - uses: actions/checkout@master
-      - name: Publish to docker hub
-        run: |
-            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_NAME }}" --password-stdin
-            docker push rupesh1050/multi-client
-            docker push rupesh1050/multi-server
-            docker push rupesh1050/multi-worker
+
   DeployProd:
     name: Deploy to Production 
-    needs: [DeployDev]
     runs-on: ubuntu-latest
     environment: 
       name: Production
@@ -73,8 +41,5 @@ jobs:
         with:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
           clusterName: ${{secrets.CLUSTER_NAME}}
-
-      - name: create secret 
-        run: kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}}
       - name : deploy on cluster 
         run : kubectl apply -f ./k8s 
