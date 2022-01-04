@@ -43,7 +43,9 @@ jobs:
           clusterName: ${{secrets.CLUSTER_NAME}}
 
       - name: create secret
-        run: kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{ github.event.repository.name }},
+        run: |
+          kubectl create namespace ${{ github.event.repository.name }}
+          kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{ github.event.repository.name }}
            
       - name : deploy on cluster 
         run : kubectl apply -f ./k8s -n ${{ github.event.repository.name }}
