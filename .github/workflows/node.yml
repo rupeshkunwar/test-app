@@ -1,4 +1,4 @@
-name: Node.js CI
+name: test-app
 
 on:
   push:
@@ -23,7 +23,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-
+    - run: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
+    - run: docker run -e CI=true rupesh1050/react-test npm test
     
   DeployDev:
     name: Deploy to Dev 
@@ -43,12 +44,18 @@ jobs:
       - name: Build the container image
         run: | 
             docker build -t rupesh1050/multi-client:latest ./client
+            docker build -t rupesh1050/multi-nginx:latest ./nginx
+            docker build -t rupesh1050/multi-server:latest ./server
+            docker build -t rupesh1050/multi-worker:latest ./worker
       - uses: anchore/scan-action@v3
         with:
             image: "rupesh1050/multi-client:latest"
             fail-build: false
       - uses: actions/checkout@master
-      - name: Publish to rupesh1050/multi-client
+      - name: Publish to docker hub
         run: |
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_NAME }}" --password-stdin
             docker push rupesh1050/multi-client
+            docker push rupesh1050/multi-nginx
+            docker push rupesh1050/multi-server
+            docker push rupesh1050/multi-worker
