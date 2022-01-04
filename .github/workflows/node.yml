@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: Production
-      url: 'http://www.myapp.com'
+      url: 'http:${{ env.PUBLIC_IP }}'
     steps:
       - name: Deploy
         run: echo I am deploying! 
@@ -49,3 +49,9 @@ jobs:
            
       - name : deploy on cluster 
         run : kubectl apply -f ./k8s -n ${{ github.event.repository.name }}
+      - name: Ingress Ip
+        id: ipv4
+        run: |
+          echo 'PUBLIC_IP<<EOF' >> $GITHUB_ENV
+          kubectl get svc -n ingress-nginx | grep LoadBalancer | awk '{ print $4 }' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
