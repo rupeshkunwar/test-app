@@ -41,10 +41,6 @@ jobs:
         with:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
           clusterName: ${{secrets.CLUSTER_NAME}}
-      - name: delete namespaces and env
-        run : |
-           kubectl delete -f ./k8s/ -n ${{ github.event.repository.name }}
-           kubectl delete namespaces ${{ github.event.repository.name }}
       - name: create secret
         run: |
           kubectl create namespace ${{ github.event.repository.name }}
