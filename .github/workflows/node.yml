@@ -59,10 +59,6 @@ jobs:
         run: terraform -chdir=terraform-deploy/ plan
         env:
           NAME: ${{secrets.CLUSTER_NAME}}
-      - name: create cluster on Digitalocean
-        uses: matootie/dokube@v1.3.4
-        with:
-          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform -chdir=terraform-deploy/ apply -auto-approve
