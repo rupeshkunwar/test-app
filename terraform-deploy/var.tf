@@ -10,9 +10,3 @@ variable "IMAGE"{
 variable "K8S_VERSION" {
     default = "1.21.5-do.0"
 }
-variable "ACCESS_KEY" {
-    default = " "
-}
-variable "SECRET_KEY" {
-    default = " "
-}
