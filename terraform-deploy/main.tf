@@ -12,7 +12,7 @@ terraform {
 provider "digitalocean" {}
 
 resource "digitalocean_project" "multi-k8s" {
-  name        = "${var.NAME}"
+  name        = "${secrets.CLUSTER_NAME}"
   description = "A project to represent development resources."
   purpose     = "Web Application"
   environment = "Development"
