@@ -45,6 +45,9 @@ jobs:
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
         run: terraform -chdir=terraform-deploy/ init
+        env: 
+          aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws_secret_access_key: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
       # Checks that all Terraform configuration files adhere to a canonical format
       - name: Terraform Format
         run: terraform -chdir=terraform-deploy/ validate
