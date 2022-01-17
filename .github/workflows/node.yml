@@ -45,25 +45,24 @@ jobs:
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
         run: terraform -chdir=terraform-deploy/ init
-        env:
-          NAME: ${{secrets.CLUSTER_NAME}}
-
       # Checks that all Terraform configuration files adhere to a canonical format
       - name: Terraform Format
         run: terraform -chdir=terraform-deploy/ validate
-        env:
-          NAME: ${{secrets.CLUSTER_NAME}}
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
         run: terraform -chdir=terraform-deploy/ plan
         env:
-          NAME: ${{secrets.CLUSTER_NAME}}
+          var.NAME: ${{secrets.CLUSTER_NAME}}
+          aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws_secret_access_key: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform -chdir=terraform-deploy/ apply -auto-approve
         env:
-          NAME: ${{secrets.CLUSTER_NAME}}
+          var.NAME: ${{secrets.CLUSTER_NAME}}
+          aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws_secret_access_key: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
 
   DeployProd:
