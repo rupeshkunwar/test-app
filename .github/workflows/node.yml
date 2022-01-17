@@ -46,8 +46,8 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=terraform-deploy/ init
         env: 
-          aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws_secret_access_key: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
       # Checks that all Terraform configuration files adhere to a canonical format
       - name: Terraform Format
         run: terraform -chdir=terraform-deploy/ validate
@@ -57,15 +57,15 @@ jobs:
         run: terraform -chdir=terraform-deploy/ plan
         env:
           var.NAME: ${{secrets.CLUSTER_NAME}}
-          aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws_secret_access_key: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform -chdir=terraform-deploy/ apply -auto-approve
         env:
           var.NAME: ${{secrets.CLUSTER_NAME}}
-          aws_access_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws_secret_access_key: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
 
   DeployProd:
