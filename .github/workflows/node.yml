@@ -23,11 +23,44 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+  DeployDev:
+    name: Deploy to Dev 
+    if: |
+     github.event.ref == 'refs/heads/main' ||
+     github.event.ref == 'refs/heads/release'
+    needs: [build ]
+    runs-on: ubuntu-latest
+    environment: 
+      name: Dev
+    steps:
+      - name: Deploy
+        run: echo I am deploying on Dev Environment ! 
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform -chdir=terraform-deploy/ init
+
+      # Checks that all Terraform configuration files adhere to a canonical format
+      - name: Terraform Format
+        run: terraform -chdir=terraform-deploy/ fmt -check
+
+      # Generates an execution plan for Terraform
+      - name: Terraform Plan
+        run: terraform -chdir=terraform-deploy/ plan
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform -chdir=terraform-deploy/ apply -auto-approve
 
   DeployProd:
     name: Deploy to Production 
+    needs : DeployDev
     runs-on: ubuntu-latest
     environment: 
       name: Production
@@ -36,7 +69,8 @@ jobs:
       - name: Deploy
         run: echo I am deploying! 
       - uses: actions/checkout@v2
-      - name: Set up Digitalocean cluster
+
+      - name: deploy on Digitalocean cluster
         uses: matootie/dokube@v1.3.4
         with:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
