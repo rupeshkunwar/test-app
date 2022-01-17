@@ -48,31 +48,31 @@ jobs:
         run: terraform -chdir=terraform-deploy/ init
         env: 
            NAME: ${{secrets.CLUSTER_NAME}}
-           ACCESS_KEY: ${{secret.AWS_ACCESS_KEY_ID}}
-           SECRET_KEY: $ {{secret.AWS_SECRET_ACCESS_KEY}}
+           ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
+           SECRET_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
 
       # Checks that all Terraform configuration files adhere to a canonical format
       - name: Terraform Format
         run: terraform -chdir=terraform-deploy/ fmt -check
         env: 
            NAME: ${{secrets.CLUSTER_NAME}}
-           ACCESS_KEY: ${{secret.AWS_ACCESS_KEY_ID}}
-           SECRET_KEY: $ {{secret.AWS_SECRET_ACCESS_KEY}}
+           ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
+           SECRET_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
         run: terraform -chdir=terraform-deploy/ plan
         env: 
            NAME: ${{secrets.CLUSTER_NAME}}
-           ACCESS_KEY: ${{secret.AWS_ACCESS_KEY_ID}}
-           SECRET_KEY: $ {{secret.AWS_SECRET_ACCESS_KEY}}
+           ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
+           SECRET_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform -chdir=terraform-deploy/ apply -auto-approve
         env: 
            NAME: ${{secrets.CLUSTER_NAME}}
-           ACCESS_KEY: ${{secret.AWS_ACCESS_KEY_ID}}
-           SECRET_KEY: $ {{secret.AWS_SECRET_ACCESS_KEY}}
+           ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY_ID}}
+           SECRET_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
 
   DeployProd:
     name: Deploy to Production 
