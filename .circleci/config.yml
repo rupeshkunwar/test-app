@@ -1,12 +1,11 @@
 version: 2.1
 orbs:
   node: circleci/node@4.7
+  docker: circleci/docker@1.7.0
 executors:
   app-executor:
     docker:
-      - image: circleci/node:15.5.0
-    working_directory: ~/repo
-    resource_class: small
+      - image: cimg/base:stable
   docker-publisher:
     environment:
       IMAGE_NAME: uzoeddie/cinemadb
