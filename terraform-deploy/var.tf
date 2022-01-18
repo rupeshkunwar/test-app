@@ -1,5 +1,4 @@
 variable "NAME" {
-  "${{ secrets.CLUSTER_NAME }}"
 }
 variable "REGION" {
   default = "blr1"

@@ -54,10 +54,10 @@ jobs:
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
-        run: terraform -chdir=terraform-deploy/ plan
+        run: terraform -chdir=terraform-deploy/ plan -var="NAME=${{ secrets.CLUSTER_NAME }}"
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform -chdir=terraform-deploy/ apply -auto-approve
+        run: terraform -chdir=terraform-deploy/ apply -var="NAME=${{ secrets.CLUSTER_NAME }}" -auto-approve
 
   DeployProd:
     name: Deploy to Production
