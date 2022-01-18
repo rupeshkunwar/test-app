@@ -37,7 +37,7 @@ jobs:
     steps:
       - docker/build:
           image: rupesh1050/react-test 
-          dockerfile: /client/Dockerfile.dev 
+          dockerfile: Dockerfile.dev 
           path: ./client  
   unit-test:
     executor: app-executor
