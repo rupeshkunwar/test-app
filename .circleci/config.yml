@@ -7,6 +7,11 @@ executors:
       - image: circleci/node:15.5.0
     working_directory: ~/repo
     resource_class: small
+  docker-publisher:
+    environment:
+      IMAGE_NAME: uzoeddie/cinemadb
+    docker:
+      - image: circleci/buildpack-deps:stretch
 
 aliases:
   - &show-current-branch-name
