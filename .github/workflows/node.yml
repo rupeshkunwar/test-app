@@ -70,12 +70,6 @@ jobs:
       - name: Deploy
         run: echo I am deploying!
       - uses: actions/checkout@v2
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_TOKEN }}
-      - name: install NGINX Ingress Controller
-        run: doctl kubernetes clusters create --size s-4vcpu-8gb ${{secrets.CLUSTER_NAME}} --1-clicks ingress-nginx
       - name: deploy on Digitalocean cluster
         uses: matootie/dokube@v1.3.4
         with:
@@ -83,7 +77,6 @@ jobs:
           clusterName: ${{secrets.CLUSTER_NAME}}
       - name: create secret
         run: |
-          doctl kubernetes clusters create --size s-4vcpu-8gb ${{secrets.CLUSTER_NAME}} --1-clicks ingress-nginx
           kubectl create namespace ${{ github.event.repository.name }}
           kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{ github.event.repository.name }}
 
@@ -95,3 +88,17 @@ jobs:
           echo 'PUBLIC_IP<<EOF' >> $GITHUB_ENV
           kubectl get svc -n ingress-nginx | grep LoadBalancer | awk '{ print $4 }' >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+  DestroyCluster:
+    name: Deploy to Production
+    needs: DeployProd
+    runs-on: ubuntu-latest
+    environment:
+      name: Clean
+      url: "http://${{ env.PUBLIC_IP }}"
+    steps:
+      - name: Deploy
+        run: echo I am deploying!
+      - uses: actions/checkout@v2
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform -chdir=terraform-deploy/ destroy -var="NAME=${{ secrets.CLUSTER_NAME }}" -auto-approve
