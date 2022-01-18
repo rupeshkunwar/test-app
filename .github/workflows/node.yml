@@ -8,6 +8,8 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  var.NAME: ${{ secrets.CLUSTER_NAME }}
+  DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -54,14 +56,9 @@ jobs:
       # Generates an execution plan for Terraform
       - name: Terraform Plan
         run: terraform -chdir=terraform-deploy/ plan
-        env:
-          var.NAME: ${{secrets.CLUSTER_NAME}}
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform -chdir=terraform-deploy/ apply -auto-approve
-        env:
-          var.NAME: ${{secrets.CLUSTER_NAME}}
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
 
   DeployProd:
     name: Deploy to Production
