@@ -5,7 +5,9 @@ orbs:
 executors:
   app-executor:
     docker:
-      - image: cimg/base:stable
+      - image: circleci/node:16.x
+    working_directory: ~/repo
+    resource_class: small
   docker-publisher:
     environment:
       IMAGE_NAME: uzoeddie/cinemadb
@@ -29,7 +31,9 @@ aliases:
 
 jobs:
   build:
-    executor: app-executor
+    docker:
+      # replace with your preferred image
+      - image: cimg/base:stable
     steps:
       - checkout
       - *show-current-branch-name
