@@ -73,7 +73,7 @@ jobs:
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          token: ${{ secrets.DIGITALOCEAN_TOKEN }}
       - name: install NGINX Ingress Controller
         run: doctl kubernetes clusters create --size s-4vcpu-8gb ${{secrets.CLUSTER_NAME}} --1-clicks ingress-nginx
       - name: deploy on Digitalocean cluster
