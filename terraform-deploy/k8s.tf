@@ -7,11 +7,5 @@ resource "digitalocean_kubernetes_cluster" "multi-k8s" {
     name       = "${var.NAME}-node"
     size       = "${var.IMAGE}"
     node_count = 3
-
-    taint {
-      key    = "workloadKind"
-      value  = "database"
-      effect = "NoSchedule"
-    }
   }
 }
