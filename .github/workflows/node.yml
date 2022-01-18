@@ -89,12 +89,11 @@ jobs:
           kubectl get svc -n ingress-nginx | grep LoadBalancer | awk '{ print $4 }' >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
   DestroyCluster:
-    name: Deploy to Production
+    name: clean resources
     needs: DeployProd
     runs-on: ubuntu-latest
     environment:
       name: Clean
-      url: "http://${{ env.PUBLIC_IP }}"
     steps:
       - name: Deploy
         run: echo I am deploying!
