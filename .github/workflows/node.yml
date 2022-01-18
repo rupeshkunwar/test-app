@@ -70,7 +70,11 @@ jobs:
       - name: Deploy
         run: echo I am deploying!
       - uses: actions/checkout@v2
-
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        run: doctl kubernetes clusters create --size s-4vcpu-8gb ${{secrets.CLUSTER_NAME}} --1-clicks ingress-nginx
       - name: deploy on Digitalocean cluster
         uses: matootie/dokube@v1.3.4
         with:
@@ -78,6 +82,7 @@ jobs:
           clusterName: ${{secrets.CLUSTER_NAME}}
       - name: create secret
         run: |
+          doctl kubernetes clusters create --size s-4vcpu-8gb ${{secrets.CLUSTER_NAME}} --1-clicks ingress-nginx
           kubectl create namespace ${{ github.event.repository.name }}
           kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{ github.event.repository.name }}
 

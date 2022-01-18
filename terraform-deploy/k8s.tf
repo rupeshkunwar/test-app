@@ -6,7 +6,7 @@ resource "digitalocean_kubernetes_cluster" "multi-k8s" {
   node_pool {
     name       = "${var.NAME}-node"
     size       = "${var.IMAGE}"
-    node_count = 4
+    node_count = 3
 
     taint {
       key    = "workloadKind"
