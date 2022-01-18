@@ -1,28 +1,83 @@
 version: 2.1
-
-
 orbs:
   node: circleci/node@4.7
-steps:
+executors:
+  app-executor:
+    docker:
+      - image: circleci/node:15.5.0
+    working_directory: ~/repo
+    resource_class: small
+
+aliases:
+  - &show-current-branch-name
+    run:
+      name: Show current branch
+      command: echo ${CIRCLE_BRANCH}
+  - &install-aws-cli
+    run:
+      name: Installing AWS CLI
+      working_directory: /
+      command: |
+        sudo apt-get -y -qq update
+        sudo apt-get install -y awscli
+        sudo apt-get install -y python-pip python-dev build-essential
+
+
+jobs:
+  build:
+    executor: app-executor
+    steps:
       - checkout
+      - *show-current-branch-name
       - run:
-          name: build
-          command: |
-            npm run start
-            npm run build
+          name: build image
+          command: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
+  unit-test:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show-current-branch-name
       - run:
-          name: build
+          name: Run unit unit
+          command: docker run -e CI=true rupesh1050/react-test npm test
+  publish-to-docker-hub:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker login -u "${DOCKER_HUB_USER}" -p "${DOCKER_HUB_PASSWORD}"
+      - run:
+          name: docker build
           command: |
-            npm run test
-      - store_artifacts:
-          path: test-reports/
-          destination: tr1
-      - store_test_results:
-          path: test-reports/
+                docker build -t rupesh1050/multi-client:latest ./client
+                docker build -t rupesh1050/multi-nginx:latest ./nginx
+                docker build -t rupesh1050/multi-server:latest ./server
+                docker build -t rupesh1050/multi-worker:latest ./worker
+      - run:
+          name: Tag and push to docker hub
+          command: |
+                  docker push rupesh1050/multi-client
+                  docker push rupesh1050/multi-nginx
+                  docker push rupesh1050/multi-server
+                  docker push rupesh1050/multi-worker
 
 workflows:
-  pipeline: 
+  build_and_deploy:
     jobs:
-      - node/test:
-          version: '16.10'
-          pkg-manager: npm
+      - build
+      - unit-test:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - dev
+                - main
+      - publish-to-docker-hub:
+          requires:
+            - unit-test
+          filters:
+            branches:
+              only:
+                - dev
+                - main
