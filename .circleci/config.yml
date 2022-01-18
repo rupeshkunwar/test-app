@@ -35,6 +35,8 @@ jobs:
       # replace with your preferred image
       - image: cimg/base:stable
     steps:
+      - checkout
+      - *show-current-branch-name
       - docker/build:
           image: rupesh1050/react-test 
           dockerfile: Dockerfile.dev 
