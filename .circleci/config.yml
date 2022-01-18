@@ -1,7 +1,6 @@
 version: 2.1
 orbs:
   node: circleci/node@4.7
-  docker: circleci/docker@1.7.0
 executors:
   app-executor:
     docker:
@@ -31,16 +30,13 @@ aliases:
 
 jobs:
   build:
-    docker:
-      # replace with your preferred image
-      - image: cimg/base:stable
+    executor: docker-publisher
     steps:
       - checkout
       - *show-current-branch-name
-      - docker/build:
-          image: rupesh1050/react-test 
-          dockerfile: Dockerfile.dev 
-          path: ./client  
+      - run:
+          name: build image
+          command: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
   unit-test:
     executor: app-executor
     steps:
