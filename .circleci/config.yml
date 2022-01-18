@@ -35,11 +35,10 @@ jobs:
       # replace with your preferred image
       - image: cimg/base:stable
     steps:
-      - checkout
-      - *show-current-branch-name
-      - run:
-          name: build image
-          command: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
+      - docker/build:
+          image: rupesh1050/react-test 
+          dockerfile: /client/Dockerfile.dev 
+          path: ./client  
   unit-test:
     executor: app-executor
     steps:
