@@ -48,6 +48,7 @@ jobs:
         env: 
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_DEFAULT_REGION : ap-south-1
       # Checks that all Terraform configuration files adhere to a canonical format
       - name: Terraform Format
         run: terraform -chdir=terraform-deploy/ validate
@@ -59,6 +60,7 @@ jobs:
           var.NAME: ${{secrets.CLUSTER_NAME}}
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_DEFAULT_REGION : ap-south-1
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform -chdir=terraform-deploy/ apply -auto-approve
@@ -66,6 +68,7 @@ jobs:
           var.NAME: ${{secrets.CLUSTER_NAME}}
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: $ {{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_DEFAULT_REGION : ap-south-1
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
 
   DeployProd:
