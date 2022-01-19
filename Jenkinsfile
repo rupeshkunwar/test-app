@@ -8,7 +8,7 @@ pipeline {
             steps { 
 
                  sh 'sudo -S docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client'
-                }
+                
             }
         }
         stage('Test') {
@@ -48,3 +48,4 @@ pipeline {
             }
         }
     }
+}
