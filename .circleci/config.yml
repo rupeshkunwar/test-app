@@ -7,6 +7,14 @@ executors:
       - image: circleci/node:16.x
     working_directory: ~/repo
     resource_class: small
+  docker-build:
+    docker:
+      - image: cimg/base:stable
+        auth:
+          # ensure you have first added these secrets
+          # visit app.circleci.com/settings/project/github/rupeshkunwar/test-app/environment-variables
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
   docker-publisher:
     environment:
       IMAGE_NAME: uzoeddie/cinemadb
@@ -30,7 +38,7 @@ aliases:
 
 jobs:
   build:
-    executor: docker-publisher
+    executor: docker-build
     steps:
       - checkout
       - *show-current-branch-name
