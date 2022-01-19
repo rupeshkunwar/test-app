@@ -18,8 +18,8 @@ pipeline {
             steps {
                     withCredentials([usernamePassword(credentialsId: 'DOCKER_LOGIN', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_NAME')]) {
                     sh 'sudo -S docker login -u ${DOCKER_NAME} -p ${DOCKER_PASSWORD}'
-                    sh 'sudo -S docker build -t rupesh1050/multi-client:${BRANCH} ./client'
-                    sh 'sudo -S docker push rupesh1050/multi-client:${BRANCH}'
+                    sh 'sudo -S docker build -t rupesh1050/multi-client:${GIT_BRANCH} ./client'
+                    sh 'sudo -S docker push rupesh1050/multi-client:${BUILD_NUMBER}'
                 }
             }
         }
@@ -28,8 +28,8 @@ pipeline {
             steps {
                     withCredentials([usernamePassword(credentialsId: 'DOCKER_LOGIN', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_NAME')]) {
                     sh 'sudo -S docker login -u ${DOCKER_NAME} -p ${DOCKER_PASSWORD}'
-                    sh 'sudo -S docker build -t rupesh1050/multi-server:${BRANCH} ./server'
-                    sh 'sudo -S docker push rupesh1050/multi-server:${BRANCH}'
+                    sh 'sudo -S docker build -t rupesh1050/multi-server:${BUILD_NUMBER} ./server'
+                    sh 'sudo -S docker push rupesh1050/multi-server:${BUILD_NUMBER}'
                 }
             }
         }
@@ -40,8 +40,8 @@ pipeline {
             steps {
                     withCredentials([usernamePassword(credentialsId: 'DOCKER_LOGIN', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_NAME')]) {
                     sh 'sudo -S docker login -u ${DOCKER_NAME} -p ${DOCKER_PASSWORD}'
-                    sh 'sudo -S docker build -t rupesh1050/multi-worker:${BRANCH} ./worker'
-                    sh 'sudo -S docker push rupesh1050/multi-worker:${BRANCH}'
+                    sh 'sudo -S docker build -t rupesh1050/multi-worker:${BUILD_NUMBER} ./worker'
+                    sh 'sudo -S docker push rupesh1050/multi-worker:${BUILD_NUMBER}'
                 }
             }
         }
