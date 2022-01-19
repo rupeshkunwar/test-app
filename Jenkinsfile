@@ -1,6 +1,8 @@
 pipeline {
-    agent any
-
+  environment {
+     BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
+  }
+      agent any
     stages {
         stage('Build') {
             steps { 
@@ -18,7 +20,7 @@ pipeline {
             steps {
                     withCredentials([usernamePassword(credentialsId: 'DOCKER_LOGIN', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_NAME')]) {
                     sh 'sudo -S docker login -u ${DOCKER_NAME} -p ${DOCKER_PASSWORD}'
-                    sh 'sudo -S docker build -t rupesh1050/multi-client:${env.GIT_BRANCH} ./client'
+                    sh 'sudo -S docker build -t rupesh1050/multi-client:${BRANCH_NAME} ./client'
                     sh 'sudo -S docker push rupesh1050/multi-client:${BUILD_NUMBER}'
                 }
             }
