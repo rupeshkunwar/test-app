@@ -1,106 +1,106 @@
-name: test-app
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
-  DeployDev:
-    name: Deploy to Dev
-    if: |
-      github.event.ref == 'refs/heads/main' ||
-      github.event.ref == 'refs/heads/release'
-    needs: [build]
-    runs-on: ubuntu-latest
-    environment:
-      name: Dev
-    steps:
-      - name: Deploy
-        run: echo I am deploying on Dev Environment !
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-      - name: Terraform Init
-        run: terraform -chdir=terraform-deploy/ init
-      # Checks that all Terraform configuration files adhere to a canonical format
-      - name: Terraform Format
-        run: terraform -chdir=terraform-deploy/ validate
-
-      # Generates an execution plan for Terraform
-      - name: Terraform Plan
-        run: terraform -chdir=terraform-deploy/ plan -var="NAME=${{ secrets.CLUSTER_NAME }}"
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform -chdir=terraform-deploy/ apply -var="NAME=${{ secrets.CLUSTER_NAME }}" -auto-approve
-
-  DeployProd:
-    name: Deploy to Production
-    needs: DeployDev
-    runs-on: ubuntu-latest
-    environment:
-      name: Production
-      url: "http://${{ env.PUBLIC_IP }}"
-    steps:
-      - name: Deploy
-        run: echo I am deploying!
-      - uses: actions/checkout@v2
-      - name: deploy on Digitalocean cluster
-        uses: matootie/dokube@v1.3.4
-        with:
-          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
-          clusterName: ${{secrets.CLUSTER_NAME}}
-      - name: create secret
-        run: |
-          kubectl create namespace ${{ github.event.repository.name }}
-          kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{ github.event.repository.name }}
-
-      - name: deploy on cluster
-        run: kubectl apply -f ./k8s -n ${{ github.event.repository.name }}
-      - name: Ingress Ip
-        id: ipv4
-        run: |
-          echo 'PUBLIC_IP<<EOF' >> $GITHUB_ENV
-          kubectl get svc -n ingress-nginx | grep LoadBalancer | awk '{ print $4 }' >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-  DestroyCluster:
-    name: clean resources
-    needs: DeployProd
-    runs-on: ubuntu-latest
-    environment:
-      name: Clean
-    steps:
-      - name: Deploy
-        run: echo I am deploying!
-      - uses: actions/checkout@v2
-      - name: Terraform Init
-        run: terraform -chdir=terraform-deploy/ init
-      - name: Terraform Plan
-        run: terraform -chdir=terraform-deploy/ plan -var="NAME=${{ secrets.CLUSTER_NAME }}"
-      - name: Terraform Destroy
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform -chdir=terraform-deploy/ destroy -var="NAME=${{ secrets.CLUSTER_NAME }}" -auto-approve
+#name: test-app#
+#on:
+#  push:
+#    branches: [main]
+#  pull_request:
+#    branches: [main]
+#env:
+#  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#  DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#
+#    strategy:
+#      matrix:
+#        node-version: [16.x]
+#        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Use Node.js ${{ matrix.node-version }}
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: ${{ matrix.node-version }}
+#          cache: "npm"
+#  DeployDev:
+#    name: Deploy to Dev
+#    if: |
+#      github.event.ref == 'refs/heads/main' ||
+#      github.event.ref == 'refs/heads/release'
+#    needs: [build]
+#    runs-on: ubuntu-latest
+#    environment:
+#      name: Dev
+#    steps:
+#      - name: Deploy
+#        run: echo I am deploying on Dev Environment !
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - name: Setup Terraform
+#        uses: hashicorp/setup-terraform@v1
+#        with:
+#          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+#
+#      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+#      - name: Terraform Init
+#        run: terraform -chdir=terraform-deploy/ init
+#      # Checks that all Terraform configuration files adhere to a canonical format
+#      - name: Terraform Format
+#        run: terraform -chdir=terraform-deploy/ validate
+#
+#      # Generates an execution plan for Terraform
+#      - name: Terraform Plan
+#        run: terraform -chdir=terraform-deploy/ plan -var="NAME=${{ secrets.CLUSTER_NAME }}"
+#      - name: Terraform Apply
+#        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#        run: terraform -chdir=terraform-deploy/ apply -var="NAME=${{ secrets.CLUSTER_NAME }}" -auto-approve
+#
+#  DeployProd:
+#    name: Deploy to Production
+#    needs: DeployDev
+#    runs-on: ubuntu-latest
+#    environment:
+#      name: Production
+#      url: "http://${{ env.PUBLIC_IP }}"
+#    steps:
+#      - name: Deploy
+#        run: echo I am deploying!
+#      - uses: actions/checkout@v2
+#      - name: deploy on Digitalocean cluster
+#        uses: matootie/dokube@v1.3.4
+#        with:
+#          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
+#          clusterName: ${{secrets.CLUSTER_NAME}}
+#      - name: create secret
+#        run: |
+#          kubectl create namespace ${{ github.event.repository.name }}
+#          kubectl create secret generic pgpassword --from-literal PGPASSWORD=${{ secrets.PGPASSWORD}} -n ${{ github.event.repository.name }}
+#
+#      - name: deploy on cluster
+#        run: kubectl apply -f ./k8s -n ${{ github.event.repository.name }}
+#      - name: Ingress Ip
+#        id: ipv4
+#        run: |
+#          echo 'PUBLIC_IP<<EOF' >> $GITHUB_ENV
+#          kubectl get svc -n ingress-nginx | grep LoadBalancer | awk '{ print $4 }' >> $GITHUB_ENV
+#          echo 'EOF' >> $GITHUB_ENV
+#  DestroyCluster:
+#    name: clean resources
+#    needs: DeployProd
+#    runs-on: ubuntu-latest
+#    environment:
+#      name: Clean
+#    steps:
+#      - name: Deploy
+#        run: echo I am deploying!
+#      - uses: actions/checkout@v2
+#      - name: Terraform Init
+#        run: terraform -chdir=terraform-deploy/ init
+#      - name: Terraform Plan
+#        run: terraform -chdir=terraform-deploy/ plan -var="NAME=${{ secrets.CLUSTER_NAME }}"
+#      - name: Terraform Destroy
+#        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#        run: terraform -chdir=terraform-deploy/ destroy -var="NAME=${{ secrets.CLUSTER_NAME }}" -auto-approve
