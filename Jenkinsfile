@@ -7,7 +7,7 @@ pipeline {
         stage('Build') {
             steps { 
                 withEnv(["HOME=${env.WORKSPACE}"]){
-                 sh 'docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client'
+                 sh 'sudo -S docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client'
                 }
             }
         }
