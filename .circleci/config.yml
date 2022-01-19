@@ -10,8 +10,7 @@ jobs:
       - run:
           name: build image
           command: |
-            sudo usermod -aG docker $USER
-            docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
+            sudo docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
   unit-test:
     docker:
       - image: cimg/base:stable
