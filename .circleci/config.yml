@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  node: circleci/node@4.7
+  docker: circleci/docker@1.7.0
 jobs:
   build:
     docker:
@@ -9,12 +9,13 @@ jobs:
       - checkout
       - run:
           name: build image
-          command: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
+          command: |
+            sudo usermod -aG docker $USER
+            docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
   unit-test:
     docker:
       - image: cimg/base:stable
     steps:
-      - checkout
       - run:
           name: Run unit unit
           command: docker run -e CI=true rupesh1050/react-test npm test
@@ -22,8 +23,6 @@ jobs:
     docker:
       - image: cimg/base:stable
     steps:
-      - checkout
-      - setup_remote_docker
       - run: docker login -u "${DOCKER_HUB_USER}" -p "${DOCKER_HUB_PASSWORD}"
       - run:
           name: docker build
