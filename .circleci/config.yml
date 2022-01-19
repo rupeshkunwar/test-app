@@ -1,24 +1,62 @@
 version: 2.1
-executors:
-  my-custom-executor:
+orbs:
+  node: circleci/node@4.7
+jobs:
+  build:
     docker:
       - image: cimg/base:stable
-        auth:
-          # ensure you have first added these secrets
-          # visit app.circleci.com/settings/project/github/rupeshkunwar/test-app/environment-variables
-          username: $DOCKER_HUB_USER
-          password: $DOCKER_HUB_PASSWORD
-jobs:
-  my-job-name:
-
-    executor: my-custom-executor
     steps:
       - checkout
-      - run: |
-           docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
-          
+      - run:
+          name: build image
+          command: docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
+  unit-test:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Run unit unit
+          command: docker run -e CI=true rupesh1050/react-test npm test
+  publish-to-docker-hub:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker login -u "${DOCKER_HUB_USER}" -p "${DOCKER_HUB_PASSWORD}"
+      - run:
+          name: docker build
+          command: |
+                docker build -t rupesh1050/multi-client:latest ./client
+                docker build -t rupesh1050/multi-nginx:latest ./nginx
+                docker build -t rupesh1050/multi-server:latest ./server
+                docker build -t rupesh1050/multi-worker:latest ./worker
+      - run:
+          name: Tag and push to docker hub
+          command: |
+                  docker push rupesh1050/multi-client
+                  docker push rupesh1050/multi-nginx
+                  docker push rupesh1050/multi-server
+                  docker push rupesh1050/multi-worker
 
 workflows:
-  my-custom-workflow:
+  build_and_deploy:
     jobs:
-      - my-job-name
+      - build
+      - unit-test:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - dev
+                - main
+      - publish-to-docker-hub:
+          requires:
+            - unit-test
+          filters:
+            branches:
+              only:
+                - dev
+                - main
