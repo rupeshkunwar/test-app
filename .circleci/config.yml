@@ -1,28 +1,24 @@
 version: 2.1
+executors:
+  my-custom-executor:
+    docker:
+      - image: cimg/base:stable
+        auth:
+          # ensure you have first added these secrets
+          # visit app.circleci.com/settings/project/github/rupeshkunwar/test-app/environment-variables
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+jobs:
+  my-job-name:
 
-
-orbs:
-  node: circleci/node@4.7
-steps:
+    executor: my-custom-executor
+    steps:
       - checkout
-      - run:
-          name: build
-          command: |
-            npm run start
-            npm run build
-      - run:
-          name: build
-          command: |
-            npm run test
-      - store_artifacts:
-          path: test-reports/
-          destination: tr1
-      - store_test_results:
-          path: test-reports/
+      - run: |
+           docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client
+          
 
 workflows:
-  pipeline: 
+  my-custom-workflow:
     jobs:
-      - node/test:
-          version: '16.10'
-          pkg-manager: npm
+      - my-job-name
