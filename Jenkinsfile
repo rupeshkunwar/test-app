@@ -1,51 +1,92 @@
 pipeline {
-  environment {
-     BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
-  }
-      agent any
+    agent any
+
+    environment {
+        BRANCH_TAG = "${GIT_BRANCH.split('/').last()}"
+        DOCKER_REGISTRY = 'rupesh1050'
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+
     stages {
-        stage('Build') {
-            steps { 
-                withEnv(["HOME=${env.WORKSPACE}"]){
-                 sh 'sudo -S docker build -t rupesh1050/react-test -f ./client/Dockerfile.dev ./client'
-                }
+        stage('Build Test Image') {
+            steps {
+                sh "docker build -t ${DOCKER_REGISTRY}/react-test -f ./client/Dockerfile.dev ./client"
             }
         }
+
         stage('Test') {
             steps {
-                sh 'sudo -S docker run -e CI=true rupesh1050/react-test npm test'
-            }
-        }
-        stage('multi-client') {
-            steps {
-                    withCredentials([usernamePassword(credentialsId: 'DOCKER_LOGIN', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_NAME')]) {
-                    sh 'sudo -S docker login -u ${DOCKER_NAME} -p ${DOCKER_PASSWORD}'
-                    sh 'sudo -S docker build -t rupesh1050/multi-client:${BRANCH_NAME} ./client'
-                    sh 'sudo -S docker push rupesh1050/multi-client:${BRANCH_NAME}'
-                }
+                sh "docker run --rm -e CI=true ${DOCKER_REGISTRY}/react-test npm test -- --watchAll=false"
             }
         }
 
-        stage('multi-server') {
-            steps {
-                    withCredentials([usernamePassword(credentialsId: 'DOCKER_LOGIN', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_NAME')]) {
-                    sh 'sudo -S docker login -u ${DOCKER_NAME} -p ${DOCKER_PASSWORD}'
-                    sh 'sudo -S docker build -t rupesh1050/multi-server:${BRANCH_NAME} ./server'
-                    sh 'sudo -S docker push rupesh1050/multi-server:${BRANCH_NAME}'
+        stage('Build & Push Images') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'release/*'
+                }
+            }
+            parallel {
+                stage('Client') {
+                    steps {
+                        withCredentials([usernamePassword(
+                            credentialsId: 'DOCKER_LOGIN',
+                            passwordVariable: 'DOCKER_PASSWORD',
+                            usernameVariable: 'DOCKER_NAME'
+                        )]) {
+                            sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_NAME} --password-stdin"
+                            sh "docker build -t ${DOCKER_REGISTRY}/multi-client:${BRANCH_TAG} -t ${DOCKER_REGISTRY}/multi-client:${BUILD_NUMBER} ./client"
+                            sh "docker push ${DOCKER_REGISTRY}/multi-client:${BRANCH_TAG}"
+                            sh "docker push ${DOCKER_REGISTRY}/multi-client:${BUILD_NUMBER}"
+                        }
+                    }
+                }
+                stage('Server') {
+                    steps {
+                        withCredentials([usernamePassword(
+                            credentialsId: 'DOCKER_LOGIN',
+                            passwordVariable: 'DOCKER_PASSWORD',
+                            usernameVariable: 'DOCKER_NAME'
+                        )]) {
+                            sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_NAME} --password-stdin"
+                            sh "docker build -t ${DOCKER_REGISTRY}/multi-server:${BRANCH_TAG} -t ${DOCKER_REGISTRY}/multi-server:${BUILD_NUMBER} ./server"
+                            sh "docker push ${DOCKER_REGISTRY}/multi-server:${BRANCH_TAG}"
+                            sh "docker push ${DOCKER_REGISTRY}/multi-server:${BUILD_NUMBER}"
+                        }
+                    }
+                }
+                stage('Worker') {
+                    steps {
+                        withCredentials([usernamePassword(
+                            credentialsId: 'DOCKER_LOGIN',
+                            passwordVariable: 'DOCKER_PASSWORD',
+                            usernameVariable: 'DOCKER_NAME'
+                        )]) {
+                            sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_NAME} --password-stdin"
+                            sh "docker build -t ${DOCKER_REGISTRY}/multi-worker:${BRANCH_TAG} -t ${DOCKER_REGISTRY}/multi-worker:${BUILD_NUMBER} ./worker"
+                            sh "docker push ${DOCKER_REGISTRY}/multi-worker:${BRANCH_TAG}"
+                            sh "docker push ${DOCKER_REGISTRY}/multi-worker:${BUILD_NUMBER}"
+                        }
+                    }
                 }
             }
         }
+    }
 
-
-
-        stage('multi-worker') {
-            steps {
-                    withCredentials([usernamePassword(credentialsId: 'DOCKER_LOGIN', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_NAME')]) {
-                    sh 'sudo -S docker login -u ${DOCKER_NAME} -p ${DOCKER_PASSWORD}'
-                    sh 'sudo -S docker build -t rupesh1050/multi-worker:${BRANCH_NAME} ./worker'
-                    sh 'sudo -S docker push rupesh1050/multi-worker:${BRANCH_NAME}'
-                }
-            }
+    post {
+        always {
+            sh "docker image prune -f || true"
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+        success {
+            echo 'Pipeline succeeded!'
         }
     }
 }

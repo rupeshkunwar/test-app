@@ -1,31 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import OtherPage from './OtherPage';
 import Fib from './Fib';
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React 3
-          </a>
-          <Link to="/">Home</Link>
-          <Link to="/otherpage">Other Page</Link>
+      <div className="app-shell">
+        <div className="bg-orb orb-1" />
+        <div className="bg-orb orb-2" />
+        <header className="topbar">
+          <div>
+            <p className="eyebrow">Color Lab</p>
+            <h1>Fibonacci Prism</h1>
+            <p className="subtitle">Compute values with a vibrant dashboard.</p>
+          </div>
+          <nav className="nav-links">
+            <NavLink
+              to="/"
+              className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+            >
+              Calculator
+            </NavLink>
+            <NavLink
+              to="/otherpage"
+              className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+            >
+              Tips
+            </NavLink>
+          </nav>
         </header>
-        <div>
-          <Route exact path="/" component={Fib} />
-          <Route path="/otherpage" component={OtherPage} />
-        </div>
+        <main className="content-panel">
+          <Routes>
+            <Route path="/" element={<Fib />} />
+            <Route path="/otherpage" element={<OtherPage />} />
+          </Routes>
+        </main>
       </div>
     </Router>
   );

@@ -12,9 +12,36 @@ spec:
       labels:
         component: worker
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: tmp
+          emptyDir: {}
       containers:
         - name: worker
-          image: rupesh1050/multi-worker
+          image: rupesh1050/multi-worker:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+              ephemeral-storage: "128Mi"
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+              ephemeral-storage: "256Mi"
           env:
             - name: REDIS_HOST
               value: redis-cluster-ip-service

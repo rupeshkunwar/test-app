@@ -1,10 +1,10 @@
 terraform {
-  required_version = "~> 1.1.3"
+  required_version = ">= 1.6.0"
 
   required_providers {
     digitalocean = {
       source  = "digitalocean/digitalocean"
-      version = "~> 2.0"
+      version = "~> 2.34"
     }
   }
 }
@@ -12,10 +12,8 @@ terraform {
 provider "digitalocean" {}
 
 resource "digitalocean_project" "multi-k8s" {
-  name        = "${var.NAME}"
+  name        = var.NAME
   description = "A project to represent development resources."
   purpose     = "Web Application"
   environment = "Development"
 }
-
-

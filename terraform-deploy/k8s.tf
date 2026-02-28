@@ -1,11 +1,14 @@
 resource "digitalocean_kubernetes_cluster" "multi-k8s" {
-  name   = "${var.NAME}"
-  region = "${var.REGION}"
-  version = "${var.K8S_VERSION}"
+  name    = var.NAME
+  region  = var.REGION
+  version = var.K8S_VERSION
 
   node_pool {
     name       = "${var.NAME}-node"
-    size       = "${var.IMAGE}"
-    node_count = 3
+    size       = var.IMAGE
+    node_count = var.NODE_COUNT
+    auto_scale = true
+    min_nodes  = 2
+    max_nodes  = 5
   }
 }
